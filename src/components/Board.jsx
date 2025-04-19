@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGameMode } from "../context/GameModeContext";
 import { getEasyMove, getNormalMove, getHardMove } from "../utils/ai";
 import Square from "./Square";
@@ -19,6 +19,10 @@ export default function Board() {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [xIsNext, setXIsNext] = useState(true);
   const [winner, setWinner] = useState(null);
+  const [scores, setScores] = useState({ X: 0, O: 0, tie: 0 });
+
+  const hasUpdatedScore = useRef(false);
+
   const { mode, difficulty, resetBoard, setResetBoard } = useGameMode();
 
   useEffect(() => {
@@ -74,11 +78,43 @@ export default function Board() {
       setXIsNext(true);
       setWinner(null);
       setResetBoard(false); // reset the flag
+      hasUpdatedScore.current = false;
     }
   }, [resetBoard, setResetBoard]);
 
+  //   For the scoreboard
+  useEffect(() => {
+    if (!hasUpdatedScore.current && winner) {
+      setScores((prev) => ({
+        ...prev,
+        [winner]: prev[winner] + 1,
+      }));
+    } else if (!hasUpdatedScore.current && !winner && !board.includes(null)) {
+      setScores((prev) => ({
+        ...prev,
+        tie: prev.tie + 1,
+      }));
+      hasUpdatedScore.current = true;
+    }
+  }, [winner, board, setScores]);
+
   return (
     <div className="flex flex-col items-center gap-4 p-4">
+      {/* ScoreBoard */}
+      <div className="flex justify-center gap-6 mt-4 text-lg font-semibold text-orange-600">
+        <div>Player X: {scores.X}</div>
+        <div>Player O: {scores.O}</div>
+        <div>Ties: {scores.tie}</div>
+      </div>
+      {/* reset scoreboard button */}
+      <button
+        onClick={() => setScores({ X: 0, O: 0, tie: 0 })}
+        className="mt-2 px-4 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition"
+      >
+        Reset Scoreboard
+      </button>
+
+      {/* Game Board */}
       <div className="grid grid-cols-3 gap-2">
         {board.map((value, idx) => (
           <motion.div
@@ -94,11 +130,14 @@ export default function Board() {
       {winner && (
         <>
           <div className="text-center mt-10">
-            <p
+            <motion.div
               className={`text-3xl font-semibold transition-colors duration-150`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
             >
               {winner === "draw" ? "It's a draw!" : `${winner} wins!`}
-            </p>
+            </motion.div>
           </div>
           <button
             onClick={restart}
@@ -108,6 +147,12 @@ export default function Board() {
           </button>
         </>
       )}
+      <button
+        className="mt-2 p-10 bg-orange-500 text-white rounded-xl cursor-pointer w-full shadow-lg shadow-[rgba(0,0,0,0.8)] hover:bg-orange-600 "
+        onClick={restart}
+      >
+        Restart game
+      </button>
     </div>
   );
 }

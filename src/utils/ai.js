@@ -37,20 +37,33 @@ function tryToWinOrBlock(board, symbol) {
 
 // Hard mode: minimax
 export function getHardMove(board, player, opponent) {
-  return minimax(board, true, player, opponent).index;
+  const MAX_DEPTH = 6; //reduce to reduce difficulty
+  return minimax(board, true, player, opponent, 0, MAX_DEPTH).index;
 }
 
-function minimax(board, isMaximizing, player, opponent) {
+function minimax(board, isMaximizing, player, opponent, depth, maxDepth) {
   const winner = calculateWinner(board);
   if (winner === player) return { score: 1 };
   if (winner === opponent) return { score: -1 };
   if (!board.includes(null)) return { score: 0 };
 
+  // 🚨 Add this to stop early if depth exceeds limit
+  if (depth >= maxDepth) return { score: 0 };
+
   const moves = [];
   for (let i = 0; i < board.length; i++) {
     if (board[i] === null) {
       board[i] = isMaximizing ? player : opponent;
-      const result = minimax(board, !isMaximizing, player, opponent);
+
+      const result = minimax(
+        board,
+        !isMaximizing,
+        player,
+        opponent,
+        depth + 1,
+        maxDepth
+      );
+
       moves.push({ index: i, score: result.score });
       board[i] = null;
     }
