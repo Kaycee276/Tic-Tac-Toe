@@ -148,7 +148,7 @@ export default function Board() {
         </>
       )}
       <button
-        className="mt-2 p-10 bg-orange-500 text-white rounded-xl cursor-pointer w-full shadow-lg shadow-[rgba(0,0,0,0.8)] hover:bg-orange-600 "
+        className="mt-2 p-10 bg-orange-500 text-white rounded-xl cursor-pointer  shadow-lg shadow-[rgba(0,0,0,0.8)] hover:bg-orange-600 "
         onClick={restart}
       >
         Restart game
