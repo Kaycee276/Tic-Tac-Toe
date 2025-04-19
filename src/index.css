@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+/* src/index.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+button:focus {
+  outline: none;
+}
